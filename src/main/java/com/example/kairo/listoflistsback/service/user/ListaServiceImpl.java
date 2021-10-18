@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -51,6 +53,19 @@ public class ListaServiceImpl extends JpaCrudServiceImpl<Lista, Long, UserFilter
         }
     }
 
+    @Override
+    public InfoDTO deleteLista(Long id) {
+
+        var lista = repository.findById(id);
+
+        if (lista.isPresent()) {
+            repository.delete(lista.get());
+            return InfoDTO.builder().success(true).object(null).message("A lista do id: " + id + " foi deletada!").build();
+        } else {
+            return InfoDTO.builder().success(false).object(null).message("Não foi encontrada a lista do id " + id).build();
+        }
+    }
+
 
     private Long create(Lista entity) {
         log.debug("ListaServiceImpl.create");
@@ -69,6 +84,16 @@ public class ListaServiceImpl extends JpaCrudServiceImpl<Lista, Long, UserFilter
         } else {
             return create(newEntity);
 //            throw new CustomException("Nenhum item encontrado");
+        }
+    }
+
+    @Override
+    public InfoDTO<List<Lista>> findAllListas() {
+        try {
+            var list = repository.findAll();
+            return InfoDTO.<List<Lista>>builder().success(true).object(list).message("Foram encontrados" + list.size() + " itens").build();
+        } catch (Exception e) {
+            throw new CustomException("Ocorreu um erro ao buscar as listas: " + e.getMessage());
         }
     }
 }

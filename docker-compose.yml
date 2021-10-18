@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+  db-lists:
+    container_name: db-lists
+    image: mysql:5.7 # mysql.latest está com problemas pois não acha o host
+    restart: always
+    environment:
+      MYSQL_DATABASE: lists-dev
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+      MYSQL_ROOT_PASSWORD: user
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3309:3306"
+    volumes:
+      - ./docker/.docker/db-lists:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+    networks:
+      - app-network
+    entrypoint:
+      - docker-entrypoint.sh
+      - mysqld
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+
+#Docker Volumes
+volumes:
+  node_modules:
